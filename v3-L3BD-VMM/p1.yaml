@@ -1,0 +1,87 @@
+# ACI playbook - L3-BD and EPG VMM Creating and binding.
+# Here we expecting Tenant, VRF, VMM and L3out names are pre-configured
+---
+- name: L3-BD and EPG Creating and binding
+  hosts: apic
+  connection: local
+  gather_facts: no
+
+  vars:
+    aci_login: &aci_login
+      host: "{{ ansible_host }}"
+      username: "{{ aci_username }}"
+      password: "{{ aci_password }}"
+      validate_certs: "{{ aci_validate_certs }}"
+
+  vars_files:
+    - variables.yaml
+
+  tasks:
+    - name: Add Bridge Domain
+      cisco.aci.aci_bd:
+        <<: *aci_login
+        tenant: "{{ tenant }}"
+        bd: "{{ bd }}"
+        vrf: "{{ vrf }}"
+        name_alias: "{{ alias_bd }}"
+        description: "{{ description_bd }}"
+        l2_unknown_unicast: "{{ l2_unknown_unicast }}"
+        arp_flooding: "{{ arp_flood }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Create a subnet
+      cisco.aci.aci_bd_subnet:
+        <<: *aci_login
+        tenant: "{{ tenant }}"
+        bd: "{{ bd }}"
+        gateway: "{{ gateway }}"
+        mask: "{{ mask }}"
+        scope: "{{ scope }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Bind bridge domain to Core L3Out
+      cisco.aci.aci_bd_to_l3out:
+        <<: *aci_login
+        bd: "{{ bd }}"
+        l3out: "{{ l3out_name }}"
+        tenant: "{{ tenant }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Add a new AP
+      cisco.aci.aci_ap:
+        <<: *aci_login
+        tenant: "{{ tenant }}"
+        ap: "{{ AppProfile }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Add a new EPG
+      cisco.aci.aci_epg:
+        <<: *aci_login
+        tenant: "{{ tenant }}"
+        ap: "{{ AppProfile }}"
+        epg: "{{ epg_name }}"
+        name_alias: "{{ alias_epg }}"
+        description: "{{ description_epg }}"
+        bd: "{{ bd }}"
+        state: present
+      delegate_to: localhost
+
+    - name: Add a new VMM domain to EPG binding
+      cisco.aci.aci_epg_to_domain:
+        <<: *aci_login
+        tenant: "{{ tenant }}"
+        ap: "{{ AppProfile }}"
+        epg: "{{ epg_name }}"
+        domain_type: "{{ domain_ty }}"   #"l2dom","phys","vmm"
+        domain: "{{ vmm_domain_name }}"
+        vm_provider: "{{ vm_provider_name }}"
+        deploy_immediacy: "{{ dep_immediacy }}"     #"immediate","lazy"
+        resolution_immediacy: "{{ reso_immediacy }}" #"immediate","lazy","pre-provision"
+        state: present
+      delegate_to: localhost
+
+

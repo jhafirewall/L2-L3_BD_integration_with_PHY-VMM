@@ -1,0 +1,4 @@
+---
+- import_playbook: csv2var.yaml
+- import_playbook: p1.yaml
+- import_playbook: deletevars.yaml

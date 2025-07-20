@@ -1,0 +1,16 @@
+variables,Value
+tenant,Serverfarm
+vrf,vrf-sfd
+bd,bd-vlan100
+alias_bd,BD_Alias
+description_bd,BD_Description
+AppProfile,app-sfd
+epg_name,epg-vlan100
+alias_epg,EPG_Alias
+description_epg,EPG_Description
+vmm_domain_name,vCenter-Domain
+vm_provider_name,vmware
+dep_immediacy,lazy
+reso_immediacy,lazy
+domain_ty,phys
+phy_domain,phd-severfarm

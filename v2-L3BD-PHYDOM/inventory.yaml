@@ -1,0 +1,9 @@
+mlglab:
+  children:
+    apic:
+      hosts:
+        10.x.x.x:
+          ansible_host: 10.x.x.x
+          aci_username: user-id
+          aci_password: passWord
+          aci_validate_certs: no
